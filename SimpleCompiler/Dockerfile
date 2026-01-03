@@ -1,23 +1,31 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+﻿FROM mcr.microsoft.com/dotnet/sdk:10.0 AS app
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG APP_USER=app
+USER app
+
+# Working directories
+WORKDIR /home/$APP_USER/src
+RUN mkdir -p /home/$APP_USER/publish
+
+# Copy project and restore
+COPY --chown=$APP_USER:$APP_USER ["SimpleCompiler.csproj", "./"]
+RUN dotnet restore
+
+# Copy source
+COPY --chown=$APP_USER:$APP_USER . .
+
+# Publish
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["SimpleCompiler/SimpleCompiler.csproj", "SimpleCompiler/"]
-RUN dotnet restore "SimpleCompiler/SimpleCompiler.csproj"
-COPY . .
-WORKDIR "/src/SimpleCompiler"
-RUN dotnet build "./SimpleCompiler.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet publish -c ${BUILD_CONFIGURATION} -o /home/$APP_USER/publish /p:UseAppHost=false
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./SimpleCompiler.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Set working directory to published app
+WORKDIR /home/$APP_USER/publish
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# Expose ports
+EXPOSE 8080 8081
+
+VOLUME ["/home/$APP_USER/publish/appsettings.json"]
+VOLUME ["/home/$APP_USER/publish/appsettings.Development.json"]
+
+# Run the app
 ENTRYPOINT ["dotnet", "SimpleCompiler.dll"]
