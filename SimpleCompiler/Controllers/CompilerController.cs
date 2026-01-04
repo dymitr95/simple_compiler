@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleCompiler.Interfaces;
 using SimpleCompiler.Models;
@@ -16,7 +17,8 @@ public class CompilerController(ICompilerService compilerService, IOptions<Compi
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<CompilerResponse>> RunCode([FromForm] string code)
     {
-        var result = await compilerService.RunCode(code);
+        var bytes = Convert.FromBase64String(code);
+        var result = await compilerService.RunCode(Encoding.UTF8.GetString(bytes));
         return Ok(result);
     }
     
@@ -34,7 +36,8 @@ public class CompilerController(ICompilerService compilerService, IOptions<Compi
         if (!inputFile.FileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
             return BadRequest(new CompilerResponse(false, "Only .txt files are allowed"));
         
-        var result = await compilerService.RunCode(code, inputFile);
+        var bytes = Convert.FromBase64String(code);
+        var result = await compilerService.RunCode(Encoding.UTF8.GetString(bytes), inputFile);
 
         return Ok(result);
     }
