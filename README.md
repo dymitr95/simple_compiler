@@ -18,7 +18,7 @@ Uses .NET SDK and system processes to do the work.
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `code` | `string` | **Required**. Your block of code |
+| `code` | `string(Base64)` | **Required**. Your block of code |
 
 #### Compile and execute simple block of code with input data
 
@@ -28,7 +28,7 @@ Uses .NET SDK and system processes to do the work.
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
-| `code`      | `string` | **Required**. Your block of code |
+| `code`      | `string(Base64)` | **Required**. Your block of code |
 | `inputFile` | `file` | **Required**. Your file with input data, only .txt format |
 
 
