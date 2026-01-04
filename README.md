@@ -4,7 +4,7 @@
 A simple .NET console app executor, initially builded for compile and execute my AoC solutions.
 Uses .NET SDK and system processes to do the work.
 
-+ Maximum allowed file size and destination directory are manageable via appsettings.json.
++ Maximum allowed file size and destination directory are manageable via appsettings.json
 + Swagger is available in development mode
 
 
